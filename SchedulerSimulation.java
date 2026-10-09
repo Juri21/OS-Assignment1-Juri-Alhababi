@@ -139,8 +139,7 @@ class Process implements Runnable {
         return remainingTime;
     }
 
-    // Feature 1
-    public void setPriority(int priority) {
+    public void setPriority(int priority) { // Feature 1
         this.priority = priority;
     }
 
@@ -156,6 +155,9 @@ class Process implements Runnable {
 }
 
 public class SchedulerSimulation {
+    // Feature 2: Count the number of scedular thraed starts.
+    private static int contextSwitchCount = 0; // Feature 2: Count the number of scedular thraed starts.
+
     public static void main(String[] args) {
         // ⚠️ IMPORTANT: Put your student ID here to seed the random number generator
         // This makes your output unique to you - DO NOT forget to change this!
@@ -213,8 +215,8 @@ public class SchedulerSimulation {
             // Create a new process object with a unique name, burst time, and the defined
             // time quantum
             Process process = new Process("P" + i, burstTime, timeQuantum);
-            // Feature 1
-            process.setPriority(1 + priorityRandom.nextInt(10));
+
+            process.setPriority(1 + priorityRandom.nextInt(10));// Feature 1
 
             // Add the process to the ready queue and the map
             addProcessToQueue(process, processQueue, processMap);
@@ -254,7 +256,8 @@ public class SchedulerSimulation {
             }
             System.out.println(Colors.BRIGHT_WHITE + "]" + Colors.RESET);
             System.out.println(Colors.BOLD + Colors.MAGENTA + "└" + "─".repeat(79) + Colors.RESET + "\n");
-
+            // Feature 2
+            contextSwitchCount++; // Feature 2
             // Start the thread, which will run the process for one time quantum
             currentThread.start();
 
@@ -297,6 +300,7 @@ public class SchedulerSimulation {
         System.out.println(Colors.BOLD + Colors.BRIGHT_GREEN +
                 "╚════════════════════════════════════════════════════════════════════════════════╝" +
                 Colors.RESET + "\n");
+        System.out.println("Total context switches: " + contextSwitchCount); // Feature 2
     }
 
     // Method to add a process to the queue and map, while printing a "ready"
@@ -318,7 +322,7 @@ public class SchedulerSimulation {
                 Colors.RESET + Colors.BLUE + " added to ready queue" + Colors.RESET +
                 " │ Burst time: " + Colors.YELLOW + process.getBurstTime() + "ms" +
                 Colors.RESET);
-        // Feature 1
-        System.out.println("     Priority: " + process.getPriority());
+
+        System.out.println("Priority: " + process.getPriority());// Feature 1
     }
 }
