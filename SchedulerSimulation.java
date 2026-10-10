@@ -3,8 +3,8 @@ import java.util.Queue;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Random;
-import java.util.ArrayList;//Feature 3
-import java.util.List;
+import java.util.ArrayList;// Feature 3: Import ArrayList to keep all process results.
+import java.util.List; // Feature 3: Import List for the process collection.
 
 // ANSI Color Codes for enhanced terminal output
 class Colors {
@@ -32,8 +32,8 @@ class Process implements Runnable {
     private int timeQuantum; // Time slice (time quantum) allowed per CPU access (in milliseconds)
     private int remainingTime; // Time left for the process to finish its execution
     private int priority; // Feature 1: Store the process priority without changing the FIFO order.
-    private long readyQueueEntryTime; // Feature 3
-    private long totalWaitingTime;
+    private long readyQueueEntryTime; // Feature 3: Remember when the process enters the ready queue.
+    private long totalWaitingTime; // Feature 3: Accumulate the time spent waiting.
 
     // Constructor to initialize the process with name, burst time, and time quantum
     public Process(String name, int burstTime, int timeQuantum) {
@@ -41,7 +41,7 @@ class Process implements Runnable {
         this.burstTime = burstTime;
         this.timeQuantum = timeQuantum;
         this.remainingTime = burstTime; // Initially, remaining time is equal to the burst time
-        this.totalWaitingTime = 0L;// Feature 3
+        this.totalWaitingTime = 0L;// Feature 3: Initialize the total waiting time.
     }
 
     // This method will be called when the thread for this process is started
@@ -144,24 +144,35 @@ class Process implements Runnable {
         return remainingTime;
     }
 
-    public void setPriority(int priority) { // Feature 1
-        this.priority = priority;
+    // Feature 1: Assign a priority to this process.
+    public void setPriority(int priority) {
+        this.priority = priority; // Feature 1: Save the assigned priority.
+
     }
 
+    // Feature 1: Return the priority for display in the ready queue.
     public int getPriority() {
-        return priority;
+        return priority; // Feature 1: Provide the priority for display.
+
     }
 
-    public void markReady() { // Feature 3
-        readyQueueEntryTime = System.currentTimeMillis();
+    // Feature 3: Record when this process enters the ready queue.
+    public void markReady() {
+        readyQueueEntryTime = System.currentTimeMillis();// Feature 3: Save the current queue entry time.
+
     }
 
+    // Feature 3: Add the waiting time before the next CPU turn.
     public void recordWaitingTime() {
-        totalWaitingTime += Math.max(0L, System.currentTimeMillis() - readyQueueEntryTime);
+        totalWaitingTime += Math.max(0L, System.currentTimeMillis() - readyQueueEntryTime); // Feature 3: Accumulate
+                                                                                            // queue waiting time.
     }
 
+    // Feature 3: Return the accumulated waiting time.
     public long getWaitingTime() {
-        return totalWaitingTime;
+
+        return totalWaitingTime;// Feature 3: Return the total waiting time.
+
     }
 
     // Check if the process has finished (i.e., no remaining time)
@@ -180,8 +191,9 @@ public class SchedulerSimulation {
         int studentID = 445052169; // ← CHANGE THIS TO YOUR ACTUAL STUDENT ID
 
         Random random = new Random(studentID);
-        // Feature 1
-        Random priorityRandom = new Random(studentID + 1L);
+
+        Random priorityRandom = new Random(studentID + 1L);// Feature 1 : Generate reproducible priorities without
+                                                           // changing burst times.
         // Define the time quantum in milliseconds (the maximum time a process gets in
         // one round)
         // Choose a random number between 2000 and 5000 ms with a step of 1000 ms
@@ -196,7 +208,7 @@ public class SchedulerSimulation {
         // Map to associate each thread with its respective process object
         Map<Thread, Process> processMap = new HashMap<>();
 
-        List<Process> allProcesses = new ArrayList<>();
+        List<Process> allProcesses = new ArrayList<>();// Feature 3: Keep all processes for the final summary table.
 
         // Print simulation header with elegant formatting
         System.out.println("\n" + Colors.BOLD + Colors.BRIGHT_CYAN +
@@ -234,10 +246,12 @@ public class SchedulerSimulation {
             // time quantum
             Process process = new Process("P" + i, burstTime, timeQuantum);
 
-            process.setPriority(1 + priorityRandom.nextInt(10));// Feature 1
-            allProcesses.add(process); // Feature 3
-            addProcessToQueue(process, processQueue, processMap);
+            process.setPriority(1 + priorityRandom.nextInt(10)); // Feature 1: Assign a priority from 1 to 10.
+
+            allProcesses.add(process); // Feature 3: Save the process for the final summary.
+
             // Add the process to the ready queue and the map
+            addProcessToQueue(process, processQueue, processMap);
 
         }
 
@@ -275,10 +289,12 @@ public class SchedulerSimulation {
             System.out.println(Colors.BRIGHT_WHITE + "]" + Colors.RESET);
             System.out.println(Colors.BOLD + Colors.MAGENTA + "└" + "─".repeat(79) + Colors.RESET + "\n");
 
-            contextSwitchCount++; // Feature 2
+            contextSwitchCount++; // Feature 2: Count this thread start.
 
-            processMap.get(currentThread).recordWaitingTime(); // Feature 3
+            processMap.get(currentThread).recordWaitingTime(); // Feature 3: Record queue waiting before execution.
+
             // Start the thread, which will run the process for one time quantum
+
             currentThread.start();
 
             // Start the thread, which will run the process for one time quantum
@@ -322,14 +338,24 @@ public class SchedulerSimulation {
         System.out.println(Colors.BOLD + Colors.BRIGHT_GREEN +
                 "╚════════════════════════════════════════════════════════════════════════════════╝" +
                 Colors.RESET + "\n");
-        System.out.println("Total context switches: " + contextSwitchCount); // Feature 2
-        System.out.println("\nProcess Summary");// Feature 3
+        System.out.println("Total context switches: " + contextSwitchCount); // Feature 2: Display the total thread
+                                                                             // starts.
+
+        System.out.println("\nProcess Summary"); // Feature 3: Display the final summary heading.
+
+        // Feature 3: Show the process name and three timing columns.
         System.out.printf("%-14s %-16s %-18s %-20s%n",
                 "Process Name", "Burst Time (ms)", "Waiting Time (ms)", "Turnaround Time (ms)");
+
+        // Feature 3: Separate column headings from the results.
         System.out.println("------------------------------------------------------------------------");
+
+        // Feature 3: Display the results for each saved process.
         for (Process process : allProcesses) {
             long waitingTime = process.getWaitingTime();
             long turnaroundTime = waitingTime + process.getBurstTime();
+
+            // Feature 3: Print the process name and calculated timing values.
             System.out.printf("%-14s %-16d %-18d %-20d%n",
                     process.getName(), process.getBurstTime(), waitingTime, turnaroundTime);
         }
@@ -345,7 +371,8 @@ public class SchedulerSimulation {
         // Add the thread to the ready queue
         processQueue.add(thread);
 
-        process.markReady(); // Feature 3
+        process.markReady(); // Feature 3: Record the ready queue entry time.
+
         // Map the thread to the process, so we can track the process associated with
         // each thread
         processMap.put(thread, process);
@@ -356,6 +383,6 @@ public class SchedulerSimulation {
                 " │ Burst time: " + Colors.YELLOW + process.getBurstTime() + "ms" +
                 Colors.RESET);
 
-        System.out.println("Priority: " + process.getPriority());// Feature 1
+        System.out.println("Priority: " + process.getPriority());// Feature 1: Display the assigned priority.
     }
 }
