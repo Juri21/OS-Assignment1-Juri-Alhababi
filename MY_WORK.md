@@ -33,7 +33,7 @@
 | **Student ID** | [445052169] |
 | **University Email** | 445052169@std.psau.edu.sa |
 | **GitHub Username** | [Juri21] |
-| **Repository Link** | [Paste your repository link here] |
+| **Repository Link** | [https://github.com/Juri21/OS-Assignment1-Juri-Alhababi.git] |
  
 ---
 
